@@ -1,109 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>S2S Applications - Admin Panel</title>
-  <style>
-    body { font-family: Arial; background: #f4f6f8; padding: 20px; }
-    .table-card { max-width: 700px; margin: 30px auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,.1); }
-    input { width: 100%; padding: 10px; margin: 8px 0; border:1px solid #ccc; border-radius:6px; font-size: 14px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { padding: 10px; border: 1px solid #ccc; text-align: left; }
-    th { background: #0d6efd; color: #fff; }
-    td[contenteditable="true"] { background: #fffbe6; cursor: text; }
-    .status { font-size: 12px; color: green; }
-    .saving { color: orange; }
-    .error { color: red; }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>S2S Applications - Admin View</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f4f6f8;margin:0;padding:0;}
+.card{max-width:900px;margin:30px auto;background:#fff;padding:20px;border-radius:10px;box-shadow:0 4px 10px rgba(0,0,0,.1);}
+h2{text-align:center;margin-bottom:10px;}
+table{width:100%;border-collapse:collapse;margin-top:20px;}
+th,td{border:1px solid #ccc;padding:8px;text-align:left;}
+th{background:#0d6efd;color:#fff;}
+td[contenteditable="true"]{background:#fffbe6;cursor:text;}
+.status-cell{font-size:12px;}
+.saving{color:orange;}
+.error{color:red;}
+</style>
 </head>
 <body>
 
-<div class="table-card" id="tableCard">
+<div class="card">
   <h2>S2S Applications – Admin Panel</h2>
   <table>
     <thead>
       <tr>
         <th>Name</th>
         <th>Email</th>
-        <th>Mobile</th>
-        <th>Plan</th>
         <th>Address</th>
+        <th>Plan</th>
+        <th>Mobile</th>
         <th>Status</th>
       </tr>
     </thead>
-    <tbody id="data"></tbody>
+    <tbody id="applicationsTable"></tbody>
   </table>
 </div>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-  import { getFirestore, collection, query, orderBy, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+import { getFirestore, collection, onSnapshot, doc, updateDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyBA9j7bROzr1g4ywC2Pno8dyGE95IeRanE",
-    authDomain: "konektv-e272b.firebaseapp.com",
-    projectId: "konektv-e272b",
-    storageBucket: "konektv-e272b.firebasestorage.app",
-    messagingSenderId: "125358472826",
-    appId: "1:125358472826:web:7796301ea310ed121045c3"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyBA9j7bROzr1g4ywC2Pno8dyGE95IeRanE",
+  authDomain: "konektv-e272b.firebaseapp.com",
+  projectId: "konektv-e272b",
+  storageBucket: "konektv-e272b.firebasestorage.app",
+  messagingSenderId: "125358472826",
+  appId: "1:125358472826:web:7796301ea310ed121045c3"
+};
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-  const dataTbody = document.getElementById('data');
+const tableBody = document.getElementById("applicationsTable");
 
-  // Load and auto-save applications
-  function loadApplications(){
-    const q = query(collection(db, "applications"), orderBy("created", "desc"));
-    onSnapshot(q, (snapshot) => {
-      dataTbody.innerHTML = "";
-      snapshot.forEach(docSnap => {
-        const d = docSnap.data();
-        const docId = docSnap.id;
-        const tr = document.createElement('tr');
+function loadApplications() {
+  const q = query(collection(db, "applications"), orderBy("created", "desc"));
+  onSnapshot(q, snapshot => {
+    tableBody.innerHTML = "";
+    snapshot.forEach(docSnap => {
+      const d = docSnap.data();
+      const docId = docSnap.id;
 
-        ['name','email','mobile','plan','address'].forEach(field => {
-          const td = document.createElement('td');
-          td.contentEditable = "true";
-          td.textContent = d[field] || '';
-          td.addEventListener('blur', () => {
-            if(td.textContent.trim() !== d[field]){
-              saveField(docId, field, td.textContent.trim(), statusTd);
-              d[field] = td.textContent.trim();
-            }
-          });
-          tr.appendChild(td);
+      const tr = document.createElement("tr");
+
+      ["name","email","address","plan","mobile"].forEach(field => {
+        const td = document.createElement("td");
+        td.contentEditable = "true";
+        td.textContent = d[field] || "";
+        td.addEventListener("blur", async () => {
+          if(td.textContent.trim() !== d[field]){
+            await saveField(docId, field, td.textContent.trim(), statusTd);
+            d[field] = td.textContent.trim();
+          }
         });
-
-        const statusTd = document.createElement('td');
-        statusTd.className = 'status';
-        tr.appendChild(statusTd);
-        dataTbody.appendChild(tr);
+        tr.appendChild(td);
       });
+
+      const statusTd = document.createElement("td");
+      statusTd.className = "status-cell";
+      tr.appendChild(statusTd);
+
+      tableBody.appendChild(tr);
     });
-  }
+  });
+}
 
-  // Save single field
-  async function saveField(docId, field, value, statusEl){
-    statusEl.textContent = 'Saving...';
-    statusEl.className = 'status saving';
-    try{
-      await updateDoc(doc(db, "applications", docId), {[field]: value});
-      statusEl.textContent = 'Saved';
-      statusEl.className = 'status';
-      setTimeout(()=>{statusEl.textContent='';},2000);
-    } catch(err){
-      console.error(err);
-      statusEl.textContent = 'Error';
-      statusEl.className = 'status error';
-    }
+async function saveField(docId, field, value, statusEl){
+  statusEl.textContent = "Saving...";
+  statusEl.className = "status-cell saving";
+  try {
+    await updateDoc(doc(db, "applications", docId), { [field]: value });
+    statusEl.textContent = "Saved";
+    statusEl.className = "status-cell";
+    setTimeout(()=>{statusEl.textContent="";},2000);
+  } catch(err){
+    console.error(err);
+    statusEl.textContent = "Error";
+    statusEl.className = "status-cell error";
   }
+}
 
-  // Initialize
-  loadApplications();
+loadApplications();
 </script>
-
 </body>
 </html>
