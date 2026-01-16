@@ -16,22 +16,29 @@
 body {
   background: #121212;
   color: #e0e0e0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   min-height: 100vh;
   padding: 20px;
 }
 
+/* ===================== Container ===================== */
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
 /* ===================== Card ===================== */
-.card {
-  width: 100%;
-  max-width: 480px;
+.card, .plan-info {
   background: #1e1e1e;
   border-radius: 15px;
   padding: 25px 30px;
   box-shadow: 0 8px 20px rgba(0,0,0,0.6);
   animation: fadeIn 0.8s ease-in-out;
+  flex: 1 1 400px;
+  min-width: 300px;
 }
 
 /* ===================== Headings ===================== */
@@ -50,11 +57,7 @@ h3 {
 
 /* ===================== Plan Info ===================== */
 .plan-info {
-  background: #2c2c2c;
   border-left: 5px solid #ff9800;
-  padding: 15px;
-  margin-bottom: 20px;
-  border-radius: 10px;
 }
 
 .plan-info p, .plan-info ul {
@@ -130,49 +133,53 @@ button:disabled {
 }
 
 /* ===================== Responsive Design ===================== */
-@media (max-width: 768px) {
-  .card {
-    padding: 20px;
-  }
-  
-  h2 {
-    font-size: 22px;
-  }
-
-  h3 {
-    font-size: 16px;
-  }
-
-  input, select, button {
-    font-size: 15px;
-    padding: 12px;
-  }
+@media (max-width: 1024px) {
+  h2 { font-size: 22px; }
+  h3 { font-size: 16px; }
+  input, select, button { font-size: 15px; padding: 12px; }
 }
 
-@media (max-width: 480px) {
-  .card {
-    padding: 15px 20px;
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .card, .plan-info {
+    width: 100%;
+    max-width: 480px;
+    padding: 20px;
   }
 
-  h2 {
-    font-size: 20px;
-  }
-
-  h3 {
-    font-size: 15px;
-  }
-
-  input, select, button {
-    font-size: 14px;
-    padding: 10px;
-  }
+  h2 { font-size: 20px; }
+  h3 { font-size: 15px; }
+  input, select, button { font-size: 14px; padding: 10px; }
 }
 </style>
 </head>
 <body>
 
-<div class="card">
-  <h2>S2S Application Form</h2>
+<div class="container">
+  <div class="card">
+    <h2>S2S Application Form</h2>
+
+    <form id="appForm" autocomplete="off">
+      <input id="name" placeholder="Full Name" required />
+      <input id="email" type="email" placeholder="Email Address" required />
+      <input id="address" placeholder="Complete Address" required />
+
+      <select id="plan" required>
+        <option value="">Select Plan</option>
+        <option value="PLAN 700">PLAN 700</option>
+        <option value="PLAN 999">PLAN 999</option>
+      </select>
+
+      <input id="mobile" placeholder="Mobile Number" required pattern="[0-9]{10,13}" />
+
+      <button id="submitBtn" type="submit">Save Application</button>
+      <div class="status" id="status"></div>
+    </form>
+  </div>
 
   <div class="plan-info">
     <h3>INTERNET: SURF2SAWA BY CONVERGE</h3>
@@ -197,23 +204,6 @@ button:disabled {
       <li>Foreign Movies</li>
     </ul>
   </div>
-
-  <form id="appForm" autocomplete="off">
-    <input id="name" placeholder="Full Name" required />
-    <input id="email" type="email" placeholder="Email Address" required />
-    <input id="address" placeholder="Complete Address" required />
-
-    <select id="plan" required>
-      <option value="">Select Plan</option>
-      <option value="PLAN 700">PLAN 700</option>
-      <option value="PLAN 999">PLAN 999</option>
-    </select>
-
-    <input id="mobile" placeholder="Mobile Number" required pattern="[0-9]{10,13}" />
-
-    <button id="submitBtn" type="submit">Save Application</button>
-    <div class="status" id="status"></div>
-  </form>
 </div>
 
 <script type="module">
