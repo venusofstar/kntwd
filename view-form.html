@@ -6,10 +6,8 @@
   <title>S2S Applications - Admin Panel</title>
   <style>
     body { font-family: Arial; background: #f4f6f8; padding: 20px; }
-    .login-card, .table-card { max-width: 700px; margin: 30px auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,.1); }
+    .table-card { max-width: 700px; margin: 30px auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,.1); }
     input { width: 100%; padding: 10px; margin: 8px 0; border:1px solid #ccc; border-radius:6px; font-size: 14px; }
-    button { background: #0d6efd; color: #fff; border: none; padding: 12px; width: 100%; border-radius:6px; font-size: 16px; cursor: pointer; }
-    button:disabled { background: #999; cursor: not-allowed; }
     table { width: 100%; border-collapse: collapse; margin-top: 20px; }
     th, td { padding: 10px; border: 1px solid #ccc; text-align: left; }
     th { background: #0d6efd; color: #fff; }
@@ -17,22 +15,12 @@
     .status { font-size: 12px; color: green; }
     .saving { color: orange; }
     .error { color: red; }
-    .logout { margin-top: 10px; background: red; }
   </style>
 </head>
 <body>
 
-<div class="login-card" id="loginCard">
-  <h2>Admin Login</h2>
-  <input type="email" id="adminEmail" placeholder="Email" required>
-  <input type="password" id="adminPass" placeholder="Password" required>
-  <button id="loginBtn">Login</button>
-  <div id="loginStatus" class="status"></div>
-</div>
-
-<div class="table-card" id="tableCard" style="display:none;">
+<div class="table-card" id="tableCard">
   <h2>S2S Applications – Admin Panel</h2>
-  <button id="logoutBtn" class="logout">Logout</button>
   <table>
     <thead>
       <tr>
@@ -50,8 +38,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-  import { getFirestore } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
-  import { getAuth } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+  import { getFirestore, collection, query, orderBy, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyBA9j7bROzr1g4ywC2Pno8dyGE95IeRanE",
@@ -64,98 +51,58 @@
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
-  const auth = getAuth(app);
 
-  console.log("Firebase initialized", app);
-</script>
+  const dataTbody = document.getElementById('data');
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
+  // Load and auto-save applications
+  function loadApplications(){
+    const q = query(collection(db, "applications"), orderBy("created", "desc"));
+    onSnapshot(q, (snapshot) => {
+      dataTbody.innerHTML = "";
+      snapshot.forEach(docSnap => {
+        const d = docSnap.data();
+        const docId = docSnap.id;
+        const tr = document.createElement('tr');
 
-const loginCard = document.getElementById('loginCard');
-const tableCard = document.getElementById('tableCard');
-const loginBtn = document.getElementById('loginBtn');
-const logoutBtn = document.getElementById('logoutBtn');
-const loginStatus = document.getElementById('loginStatus');
-const dataTbody = document.getElementById('data');
-
-loginBtn.addEventListener('click', async () => {
-  const email = document.getElementById('adminEmail').value;
-  const pass = document.getElementById('adminPass').value;
-  loginStatus.textContent = 'Logging in...';
-  try {
-    await signInWithEmailAndPassword(auth, email, pass);
-    loginStatus.textContent = '';
-  } catch(err) {
-    loginStatus.textContent = 'Login failed';
-    loginStatus.className = 'status error';
-    console.error(err);
-  }
-});
-
-logoutBtn.addEventListener('click', () => {
-  signOut(auth);
-});
-
-onAuthStateChanged(auth, (user) => {
-  if(user){
-    loginCard.style.display = 'none';
-    tableCard.style.display = 'block';
-    loadApplications();
-  } else {
-    loginCard.style.display = 'block';
-    tableCard.style.display = 'none';
-    dataTbody.innerHTML = '';
-  }
-});
-
-// Load and auto-save applications
-function loadApplications(){
-  const q = query(collection(db, "applications"), orderBy("created", "desc"));
-  onSnapshot(q, (snapshot) => {
-    dataTbody.innerHTML = "";
-    snapshot.forEach(docSnap => {
-      const d = docSnap.data();
-      const docId = docSnap.id;
-      const tr = document.createElement('tr');
-
-      ['name','email','mobile','plan','address'].forEach(field => {
-        const td = document.createElement('td');
-        td.contentEditable = "true";
-        td.textContent = d[field] || '';
-        td.addEventListener('blur', () => {
-          if(td.textContent.trim() !== d[field]){
-            saveField(docId, field, td.textContent.trim(), statusTd);
-            d[field] = td.textContent.trim();
-          }
+        ['name','email','mobile','plan','address'].forEach(field => {
+          const td = document.createElement('td');
+          td.contentEditable = "true";
+          td.textContent = d[field] || '';
+          td.addEventListener('blur', () => {
+            if(td.textContent.trim() !== d[field]){
+              saveField(docId, field, td.textContent.trim(), statusTd);
+              d[field] = td.textContent.trim();
+            }
+          });
+          tr.appendChild(td);
         });
-        tr.appendChild(td);
+
+        const statusTd = document.createElement('td');
+        statusTd.className = 'status';
+        tr.appendChild(statusTd);
+        dataTbody.appendChild(tr);
       });
-
-      const statusTd = document.createElement('td');
-      statusTd.className = 'status';
-      tr.appendChild(statusTd);
-      dataTbody.appendChild(tr);
     });
-  });
-}
-
-// Save single field
-async function saveField(docId, field, value, statusEl){
-  statusEl.textContent = 'Saving...';
-  statusEl.className = 'status saving';
-  try{
-    await updateDoc(doc(db, "applications", docId), {[field]: value});
-    statusEl.textContent = 'Saved';
-    statusEl.className = 'status';
-    setTimeout(()=>{statusEl.textContent='';},2000);
-  } catch(err){
-    console.error(err);
-    statusEl.textContent = 'Error';
-    statusEl.className = 'status error';
   }
-}
+
+  // Save single field
+  async function saveField(docId, field, value, statusEl){
+    statusEl.textContent = 'Saving...';
+    statusEl.className = 'status saving';
+    try{
+      await updateDoc(doc(db, "applications", docId), {[field]: value});
+      statusEl.textContent = 'Saved';
+      statusEl.className = 'status';
+      setTimeout(()=>{statusEl.textContent='';},2000);
+    } catch(err){
+      console.error(err);
+      statusEl.textContent = 'Error';
+      statusEl.className = 'status error';
+    }
+  }
+
+  // Initialize
+  loadApplications();
 </script>
 
 </body>
