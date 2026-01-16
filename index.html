@@ -1,21 +1,172 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>S2S Application Form</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S2S Application Form - Dark Theme</title>
 <style>
-body{font-family:Arial,sans-serif;background:#f4f6f8;margin:0;padding:0;}
-.card{max-width:420px;margin:30px auto;background:#fff;padding:20px;border-radius:10px;box-shadow:0 4px 10px rgba(0,0,0,.1);}
-h2{text-align:center;margin-bottom:10px;}
-h3{margin-top:20px;color:#0d6efd;}
-p{margin:4px 0;font-size:14px;}
-ul{margin:4px 0 10px 20px;font-size:14px;}
-input,select{width:100%;padding:10px;margin:8px 0;border:1px solid #ccc;border-radius:6px;font-size:14px;}
-button{background:#0d6efd;color:#fff;border:none;padding:12px;width:100%;border-radius:6px;font-size:16px;cursor:pointer;}
-button:disabled{background:#999;cursor:not-allowed;}
-.status{text-align:center;font-size:14px;margin-top:10px;}
-.plan-info{background:#e9f0ff;padding:10px;margin-bottom:20px;border-radius:6px;}
+/* ===================== Global Styles ===================== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Arial', sans-serif;
+}
+
+body {
+  background: #121212;
+  color: #e0e0e0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+/* ===================== Card ===================== */
+.card {
+  width: 100%;
+  max-width: 480px;
+  background: #1e1e1e;
+  border-radius: 15px;
+  padding: 25px 30px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+  animation: fadeIn 0.8s ease-in-out;
+}
+
+/* ===================== Headings ===================== */
+h2 {
+  text-align: center;
+  color: #ff9800;
+  margin-bottom: 15px;
+  font-size: 24px;
+}
+
+h3 {
+  color: #03a9f4;
+  margin-top: 20px;
+  font-size: 18px;
+}
+
+/* ===================== Plan Info ===================== */
+.plan-info {
+  background: #2c2c2c;
+  border-left: 5px solid #ff9800;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+}
+
+.plan-info p, .plan-info ul {
+  font-size: 14px;
+  margin: 5px 0;
+}
+
+.plan-info ul li {
+  margin-left: 20px;
+  line-height: 1.5;
+}
+
+/* ===================== Form Inputs ===================== */
+input, select {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: 1px solid #555;
+  border-radius: 8px;
+  background: #2c2c2c;
+  color: #fff;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+input::placeholder, select option {
+  color: #aaa;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #ff9800;
+  box-shadow: 0 0 8px rgba(255,152,0,0.5);
+}
+
+/* ===================== Button ===================== */
+button {
+  background: #ff9800;
+  color: #121212;
+  border: none;
+  padding: 14px;
+  width: 100%;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-top: 10px;
+}
+
+button:hover {
+  background: #e68900;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255,152,0,0.4);
+}
+
+button:disabled {
+  background: #555;
+  cursor: not-allowed;
+}
+
+/* ===================== Status Message ===================== */
+.status {
+  text-align: center;
+  font-size: 14px;
+  margin-top: 12px;
+  min-height: 20px;
+}
+
+/* ===================== Fade-in Animation ===================== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px);}
+  to { opacity: 1; transform: translateY(0);}
+}
+
+/* ===================== Responsive Design ===================== */
+@media (max-width: 768px) {
+  .card {
+    padding: 20px;
+  }
+  
+  h2 {
+    font-size: 22px;
+  }
+
+  h3 {
+    font-size: 16px;
+  }
+
+  input, select, button {
+    font-size: 15px;
+    padding: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 15px 20px;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+
+  h3 {
+    font-size: 15px;
+  }
+
+  input, select, button {
+    font-size: 14px;
+    padding: 10px;
+  }
+}
 </style>
 </head>
 <body>
@@ -25,13 +176,11 @@ button:disabled{background:#999;cursor:not-allowed;}
 
   <div class="plan-info">
     <h3>INTERNET: SURF2SAWA BY CONVERGE</h3>
-
     <p><strong>PLAN 700:</strong></p>
     <ul>
       <li>SPEED: Up to 50 Mbps</li>
       <li>Up to 6 gadgets</li>
     </ul>
-
     <p><strong>PLAN 999:</strong></p>
     <ul>
       <li>SPEED: Up to 100 Mbps</li>
@@ -71,7 +220,6 @@ button:disabled{background:#999;cursor:not-allowed;}
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
 import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
-// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyBA9j7bROzr1g4ywC2Pno8dyGE95IeRanE",
   authDomain: "konektv-e272b.firebaseapp.com",
