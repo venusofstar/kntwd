@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <title>S2S Applications - Admin View (Dark)</title>
 <style>
 /* ===================== Global Styles ===================== */
@@ -12,6 +12,7 @@ body {
   color: #e0e0e0;
   margin: 0;
   padding: 0;
+  line-height: 1.5;
 }
 
 /* ===================== Card Container ===================== */
@@ -22,13 +23,14 @@ body {
   padding: 20px;
   border-radius: 12px;
   box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+  overflow-x: auto;
 }
 
 /* ===================== Headings ===================== */
 h2 {
   text-align: center;
   margin-bottom: 15px;
-  font-size: 1.6em;
+  font-size: 1.8em;
   color: #ff9800;
 }
 
@@ -36,8 +38,8 @@ h2 {
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
   table-layout: fixed;
+  min-width: 600px;
   background: #2c2c2c;
   color: #e0e0e0;
 }
@@ -89,12 +91,14 @@ button.delete-btn:hover {
 }
 
 /* ===================== Responsive Styles ===================== */
+/* Landscape & Portrait tablets */
 @media (max-width: 1024px) {
   .card { margin: 15px; padding: 15px; }
-  h2 { font-size: 1.4em; }
+  h2 { font-size: 1.5em; }
   th, td { padding: 8px; font-size: 0.9em; }
 }
 
+/* Portrait phones */
 @media (max-width: 768px) {
   .card { padding: 12px; }
   h2 { font-size: 1.3em; }
@@ -102,11 +106,23 @@ button.delete-btn:hover {
   table { display: block; overflow-x: auto; white-space: nowrap; }
 }
 
+/* Small phones */
 @media (max-width: 480px) {
   .card { padding: 10px; }
   h2 { font-size: 1.1em; }
   th, td { padding: 4px; font-size: 0.8em; }
   button.delete-btn { padding: 3px 6px; font-size: 0.75em; }
+}
+
+/* Orientation-specific tweaks */
+@media (orientation: landscape) and (max-width: 768px) {
+  h2 { font-size: 1.2em; }
+  th, td { font-size: 0.8em; padding: 5px; }
+  button.delete-btn { font-size: 0.7em; padding: 2px 5px; }
+}
+@media (orientation: portrait) and (max-width: 768px) {
+  h2 { font-size: 1.3em; }
+  th, td { font-size: 0.85em; padding: 6px; }
 }
 </style>
 </head>
@@ -211,7 +227,7 @@ async function saveField(docId, field, value, statusEl){
 async function deleteApplication(docId, rowEl){
   try {
     await deleteDoc(doc(db, "applications", docId));
-    rowEl.remove(); // Remove row immediately
+    rowEl.remove();
     alert("Application deleted successfully!");
   } catch(err){
     console.error(err);
