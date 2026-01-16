@@ -3,83 +3,108 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>S2S Applications - Admin View</title>
+<title>S2S Applications - Admin View (Dark)</title>
 <style>
-/* Base styles */
+/* ===================== Global Styles ===================== */
 body {
   font-family: Arial, sans-serif;
-  background: #f4f6f8;
+  background: #121212;
+  color: #e0e0e0;
   margin: 0;
   padding: 0;
 }
+
+/* ===================== Card Container ===================== */
 .card {
   max-width: 1200px;
   margin: 20px auto;
-  background: #fff;
+  background: #1e1e1e;
   padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0,0,0,.1);
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.7);
 }
+
+/* ===================== Headings ===================== */
 h2 {
   text-align: center;
-  margin-bottom: 10px;
-  font-size: 1.5em;
+  margin-bottom: 15px;
+  font-size: 1.6em;
+  color: #ff9800;
 }
+
+/* ===================== Table ===================== */
 table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
   table-layout: fixed;
+  background: #2c2c2c;
+  color: #e0e0e0;
 }
+
 th, td {
-  border: 1px solid #ccc;
-  padding: 8px;
+  border: 1px solid #444;
+  padding: 10px;
   text-align: left;
   word-wrap: break-word;
 }
+
 th {
-  background: #0d6efd;
-  color: #fff;
+  background: #ff9800;
+  color: #121212;
+  font-weight: 600;
 }
+
 td[contenteditable="true"] {
-  background: #fffbe6;
+  background: #333;
+  color: #fff;
   cursor: text;
+  transition: 0.3s;
 }
+
+td[contenteditable="true"]:focus {
+  outline: 2px solid #ff9800;
+}
+
+/* ===================== Status Cells ===================== */
 .status-cell {
   font-size: 12px;
 }
-.saving { color: orange; }
-.error { color: red; }
+.saving { color: #ffc107; }
+.error { color: #f44336; }
+
+/* ===================== Buttons ===================== */
 button.delete-btn {
-  background:#dc3545;
-  color:#fff;
-  border:none;
-  padding:4px 8px;
-  border-radius:4px;
-  cursor:pointer;
+  background: #f44336;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
   font-size: 0.85em;
+  transition: 0.3s;
 }
 button.delete-btn:hover {
-  background:#c82333;
+  background: #d32f2f;
 }
 
-/* Responsive Styles */
+/* ===================== Responsive Styles ===================== */
 @media (max-width: 1024px) {
   .card { margin: 15px; padding: 15px; }
-  h2 { font-size: 1.3em; }
-  th, td { padding: 6px; font-size: 0.9em; }
+  h2 { font-size: 1.4em; }
+  th, td { padding: 8px; font-size: 0.9em; }
 }
 
 @media (max-width: 768px) {
-  .card { padding: 10px; }
-  h2 { font-size: 1.2em; }
-  th, td { padding: 5px; font-size: 0.85em; }
+  .card { padding: 12px; }
+  h2 { font-size: 1.3em; }
+  th, td { padding: 6px; font-size: 0.85em; }
   table { display: block; overflow-x: auto; white-space: nowrap; }
 }
 
 @media (max-width: 480px) {
-  .card { padding: 8px; }
-  h2 { font-size: 1em; }
+  .card { padding: 10px; }
+  h2 { font-size: 1.1em; }
   th, td { padding: 4px; font-size: 0.8em; }
   button.delete-btn { padding: 3px 6px; font-size: 0.75em; }
 }
@@ -109,7 +134,6 @@ button.delete-btn:hover {
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
 import { getFirestore, collection, onSnapshot, doc, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
-// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyBA9j7bROzr1g4ywC2Pno8dyGE95IeRanE",
   authDomain: "konektv-e272b.firebaseapp.com",
