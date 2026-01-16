@@ -1,20 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>S2S Applications - View Data</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>S2S Applications - View & Auto-Save</title>
 
   <style>
-    body{font-family:Arial;background:#f4f6f8;padding:20px}
-    table{width:100%;border-collapse:collapse;background:#fff}
-    th,td{padding:10px;border:1px solid #ccc;text-align:left}
-    th{background:#0d6efd;color:#fff}
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      padding: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+    th {
+      background: #0d6efd;
+      color: #fff;
+    }
+    td[contenteditable="true"] {
+      background: #fffbe6;
+      cursor: text;
+    }
+    .status {
+      font-size: 12px;
+      color: green;
+    }
+    .saving {
+      color: orange;
+    }
+    .error {
+      color: red;
+    }
   </style>
+</head>
+
+<body>
+  <h2>S2S Applications – View & Auto-Save</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Mobile</th>
+        <th>Plan</th>
+        <th>Address</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="data"></tbody>
+  </table>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-    import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+    import { getFirestore, collection, query, orderBy, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBA9j7bROzr1g4ywC2Pno8dyGE95IeRanE",
@@ -28,42 +76,54 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    document.addEventListener('DOMContentLoaded', () => {
-      const tableBody = document.getElementById('data');
-      const q = query(collection(db, "applications"), orderBy("created", "desc"));
+    const tbody = document.getElementById('data');
+    const q = query(collection(db, "applications"), orderBy("created", "desc"));
 
-      onSnapshot(q, (snapshot) => {
-        tableBody.innerHTML = "";
-        snapshot.forEach(doc => {
-          const d = doc.data();
-          tableBody.innerHTML += `
-            <tr>
-              <td>${d.name || ''}</td>
-              <td>${d.email || ''}</td>
-              <td>${d.mobile || ''}</td>
-              <td>${d.plan || ''}</td>
-              <td>${d.address || ''}</td>
-            </tr>`;
+    // Helper: Save field update
+    async function saveField(docId, field, value, statusEl) {
+      statusEl.textContent = 'Saving...';
+      statusEl.className = 'status saving';
+      try {
+        await updateDoc(doc(db, "applications", docId), { [field]: value });
+        statusEl.textContent = 'Saved';
+        statusEl.className = 'status';
+        setTimeout(() => { statusEl.textContent = ''; }, 2000);
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = 'Error';
+        statusEl.className = 'status error';
+      }
+    }
+
+    onSnapshot(q, (snapshot) => {
+      tbody.innerHTML = "";
+      snapshot.forEach(docSnap => {
+        const d = docSnap.data();
+        const docId = docSnap.id;
+
+        const tr = document.createElement('tr');
+
+        ['name','email','mobile','plan','address'].forEach(field => {
+          const td = document.createElement('td');
+          td.contentEditable = "true";
+          td.textContent = d[field] || '';
+          td.addEventListener('blur', () => {
+            if(td.textContent.trim() !== d[field]) {
+              saveField(docId, field, td.textContent.trim(), statusTd);
+              d[field] = td.textContent.trim();
+            }
+          });
+          tr.appendChild(td);
         });
+
+        const statusTd = document.createElement('td');
+        statusTd.className = 'status';
+        tr.appendChild(statusTd);
+
+        tbody.appendChild(tr);
       });
     });
+
   </script>
-</head>
-
-<body>
-  <h2>S2S Applications – View Data</h2>
-
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Mobile</th>
-        <th>Plan</th>
-        <th>Address</th>
-      </tr>
-    </thead>
-    <tbody id="data"></tbody>
-  </table>
 </body>
 </html>
