@@ -1,12 +1,13 @@
-<!-- =========================
- FILE: index.html (GitHub Pages + Firebase)
-========================= --><!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>S2S Application Form</title>
+
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
   <style>
     body{font-family:Arial;background:#f4f6f8}
     .card{max-width:420px;margin:40px auto;background:#fff;padding:20px;border-radius:10px;box-shadow:0 4px 10px rgba(0,0,0,.1)}
@@ -16,35 +17,48 @@
     .plan{border:1px solid #ddd;padding:15px;border-radius:8px;margin-bottom:15px}
   </style>
 </head>
-<body><div class="card">
+
+<body>
+
+<div class="card">
   <h2>S2S Application Form</h2>
+
   <form id="appForm">
     <input id="name" placeholder="Name" required>
     <input id="email" type="email" placeholder="Email" required>
     <input id="address" placeholder="Address" required>
+
     <select id="plan" required>
       <option value="">Select Plan</option>
       <option>PLAN 700</option>
       <option>PLAN 999</option>
     </select>
+
     <input id="mobile" placeholder="Mobile Number" required>
     <button type="submit">Save</button>
   </form>
-</div><div class="card">
-  <h2>INTERNET: SURF2SAWA BY CONVERGE</h2>  <div class="plan">
+</div>
+
+<div class="card">
+  <h2>INTERNET: SURF2SAWA BY CONVERGE</h2>
+
+  <div class="plan">
     <h3>PLAN 700</h3>
     <p><strong>Speed:</strong> Up to 50 Mbps</p>
     <p><strong>Devices:</strong> Up to 6 Gadgets</p>
     <p><strong>Price:</strong> ₱700 / month</p>
-  </div>  <div class="plan">
+  </div>
+
+  <div class="plan">
     <h3>PLAN 999</h3>
     <p><strong>Speed:</strong> Up to 100 Mbps</p>
     <p><strong>Devices:</strong> Up to 6 Gadgets</p>
     <p><strong>Bonus:</strong> FREE Cable TV</p>
     <p><strong>Price:</strong> ₱999 / month</p>
   </div>
-</div><script type="module">
-  // Firebase v12 (Module)
+</div>
+
+<script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-analytics.js";
   import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
@@ -60,7 +74,7 @@
   };
 
   const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
+  getAnalytics(app);
   const db = getFirestore(app);
 
   document.getElementById("appForm").addEventListener("submit", async (e) => {
@@ -78,69 +92,7 @@
     alert("Application Saved Successfully");
     e.target.reset();
   });
-</script></body>
-</html><!-- =========================
- FILE: view.html (View Data Page)
-========================= --><!DOCTYPE html><html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>S2S Applications - View Data</title>
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-    import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";const firebaseConfig = {
-  apiKey: "AIzaSyBA9j7bROzr1g4ywC2Pno8dyGE95IeRanE",
-  authDomain: "konektv-e272b.firebaseapp.com",
-  projectId: "konektv-e272b",
-  storageBucket: "konektv-e272b.firebasestorage.app",
-  messagingSenderId: "125358472826",
-  appId: "1:125358472826:web:875f13bc542113ef1045c3"
-};
+</script>
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-const tbody = document.addEventListener('DOMContentLoaded', () => {
-  const tableBody = document.getElementById('data');
-  const q = query(collection(db, "applications"), orderBy("created", "desc"));
-
-  onSnapshot(q, (snapshot) => {
-    tableBody.innerHTML = "";
-    snapshot.forEach(doc => {
-      const d = doc.data();
-      tableBody.innerHTML += `
-        <tr>
-          <td>${d.name || ''}</td>
-          <td>${d.email || ''}</td>
-          <td>${d.mobile || ''}</td>
-          <td>${d.plan || ''}</td>
-          <td>${d.address || ''}</td>
-        </tr>`;
-    });
-  });
-});
-
-  </script>
-  <style>
-    body{font-family:Arial;background:#f4f6f8;padding:20px}
-    table{width:100%;border-collapse:collapse;background:#fff}
-    th,td{padding:10px;border:1px solid #ccc;text-align:left}
-    th{background:#0d6efd;color:#fff}
-  </style>
-</head>
-<body>
-  <h2>S2S Applications – View Data</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Mobile</th>
-        <th>Plan</th>
-        <th>Address</th>
-      </tr>
-    </thead>
-    <tbody id="data"></tbody>
-  </table>
 </body>
 </html>
