@@ -68,12 +68,9 @@ td[contenteditable="true"]:focus {
   outline: 2px solid #ff9800;
 }
 
-/* ===================== Status Cells ===================== */
 .status-cell {
   font-size: 12px;
 }
-.saving { color: #ffc107; }
-.error { color: #f44336; }
 
 /* ===================== Buttons ===================== */
 button.delete-btn {
@@ -91,14 +88,12 @@ button.delete-btn:hover {
 }
 
 /* ===================== Responsive Styles ===================== */
-/* Landscape & Portrait tablets */
 @media (max-width: 1024px) {
   .card { margin: 15px; padding: 15px; }
   h2 { font-size: 1.5em; }
   th, td { padding: 8px; font-size: 0.9em; }
 }
 
-/* Portrait phones */
 @media (max-width: 768px) {
   .card { padding: 12px; }
   h2 { font-size: 1.3em; }
@@ -106,7 +101,6 @@ button.delete-btn:hover {
   table { display: block; overflow-x: auto; white-space: nowrap; }
 }
 
-/* Small phones */
 @media (max-width: 480px) {
   .card { padding: 10px; }
   h2 { font-size: 1.1em; }
@@ -114,7 +108,6 @@ button.delete-btn:hover {
   button.delete-btn { padding: 3px 6px; font-size: 0.75em; }
 }
 
-/* Orientation-specific tweaks */
 @media (orientation: landscape) and (max-width: 768px) {
   h2 { font-size: 1.2em; }
   th, td { font-size: 0.8em; padding: 5px; }
@@ -138,6 +131,7 @@ button.delete-btn:hover {
         <th>Address</th>
         <th>Plan</th>
         <th>Mobile</th>
+        <th>Submitted</th>
         <th>Status</th>
         <th>Action</th>
       </tr>
@@ -164,6 +158,18 @@ const db = getFirestore(app);
 
 const tableBody = document.getElementById("applicationsTable");
 
+// Format Firestore timestamp to YYYY-MM-DD HH:MM AM/PM
+function formatDate(date) {
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth()+1).padStart(2,'0');
+  const dd = String(date.getDate()).padStart(2,'0');
+  let hours = date.getHours();
+  const minutes = String(date.getMinutes()).padStart(2,'0');
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12 || 12;
+  return `${yyyy}-${mm}-${dd} ${hours}:${minutes} ${ampm}`;
+}
+
 function loadApplications() {
   const q = query(collection(db, "applications"), orderBy("created", "desc"));
   onSnapshot(q, snapshot => {
@@ -174,31 +180,43 @@ function loadApplications() {
 
       const tr = document.createElement("tr");
 
+      // NON-EDITABLE columns
       ["name","email","address","plan","mobile"].forEach(field => {
         const td = document.createElement("td");
-        td.contentEditable = "true";
         td.textContent = d[field] || "";
-        td.addEventListener("blur", async () => {
-          if(td.textContent.trim() !== d[field]){
-            await saveField(docId, field, td.textContent.trim(), statusTd);
-            d[field] = td.textContent.trim();
-          }
-        });
         tr.appendChild(td);
       });
 
+      // Submitted column (read-only)
+      const submittedTd = document.createElement("td");
+      const createdTime = d.created ? d.created.toDate() : null;
+      submittedTd.textContent = createdTime ? formatDate(createdTime) : "";
+      tr.appendChild(submittedTd);
+
+      // Status column (ONLY editable)
       const statusTd = document.createElement("td");
       statusTd.className = "status-cell";
+      statusTd.contentEditable = "true";
+      statusTd.textContent = d.status || "Submitted";
+      statusTd.addEventListener("blur", async () => {
+        try {
+          await updateDoc(doc(db, "applications", docId), { status: statusTd.textContent.trim() });
+        } catch(err){
+          console.error(err);
+          alert("Error updating status.");
+        }
+      });
       tr.appendChild(statusTd);
 
-      // DELETE BUTTON
+      // Delete button
       const actionTd = document.createElement("td");
       const deleteBtn = document.createElement("button");
       deleteBtn.textContent = "Delete";
       deleteBtn.className = "delete-btn";
       deleteBtn.addEventListener("click", async () => {
         if(confirm("Are you sure you want to delete this application?")){
-          await deleteApplication(docId, tr);
+          await deleteDoc(doc(db, "applications", docId));
+          tr.remove();
         }
       });
       actionTd.appendChild(deleteBtn);
@@ -207,32 +225,6 @@ function loadApplications() {
       tableBody.appendChild(tr);
     });
   });
-}
-
-async function saveField(docId, field, value, statusEl){
-  statusEl.textContent = "Saving...";
-  statusEl.className = "status-cell saving";
-  try {
-    await updateDoc(doc(db, "applications", docId), { [field]: value });
-    statusEl.textContent = "Saved";
-    statusEl.className = "status-cell";
-    setTimeout(()=>{statusEl.textContent="";},2000);
-  } catch(err){
-    console.error(err);
-    statusEl.textContent = "Error";
-    statusEl.className = "status-cell error";
-  }
-}
-
-async function deleteApplication(docId, rowEl){
-  try {
-    await deleteDoc(doc(db, "applications", docId));
-    rowEl.remove();
-    alert("Application deleted successfully!");
-  } catch(err){
-    console.error(err);
-    alert("Error deleting application.");
-  }
 }
 
 loadApplications();
