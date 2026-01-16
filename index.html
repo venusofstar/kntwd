@@ -7,7 +7,7 @@
 <style>
 body{font-family:Arial,sans-serif;background:#f4f6f8;margin:0;padding:0;}
 .card{max-width:420px;margin:30px auto;background:#fff;padding:20px;border-radius:10px;box-shadow:0 4px 10px rgba(0,0,0,.1);}
-h2{text-align:center;margin-bottom:10px}
+h2{text-align:center;margin-bottom:10px;}
 input,select{width:100%;padding:10px;margin:8px 0;border:1px solid #ccc;border-radius:6px;font-size:14px;}
 button{background:#0d6efd;color:#fff;border:none;padding:12px;width:100%;border-radius:6px;font-size:16px;cursor:pointer;}
 button:disabled{background:#999;cursor:not-allowed;}
@@ -40,6 +40,7 @@ button:disabled{background:#999;cursor:not-allowed;}
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
 import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
+// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyBA9j7bROzr1g4ywC2Pno8dyGE95IeRanE",
   authDomain: "konektv-e272b.firebaseapp.com",
@@ -81,5 +82,6 @@ form.addEventListener("submit", async (e) => {
   }
 });
 </script>
+
 </body>
 </html>
