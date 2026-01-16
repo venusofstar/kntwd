@@ -40,6 +40,7 @@ td[contenteditable="true"]{background:#fffbe6;cursor:text;}
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
 import { getFirestore, collection, onSnapshot, doc, updateDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
+// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyBA9j7bROzr1g4ywC2Pno8dyGE95IeRanE",
   authDomain: "konektv-e272b.firebaseapp.com",
@@ -103,5 +104,9 @@ async function saveField(docId, field, value, statusEl){
 
 loadApplications();
 </script>
+
 </body>
 </html>
+
+
+
