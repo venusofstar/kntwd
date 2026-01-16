@@ -1,67 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>S2S Application Form</title>
-
-  <style>
-    body{
-      font-family:Arial, sans-serif;
-      background:#f4f6f8;
-      margin:0;
-      padding:0;
-    }
-    .card{
-      max-width:420px;
-      margin:30px auto;
-      background:#fff;
-      padding:20px;
-      border-radius:10px;
-      box-shadow:0 4px 10px rgba(0,0,0,.1)
-    }
-    h2{text-align:center;margin-bottom:10px}
-    input,select{
-      width:100%;
-      padding:10px;
-      margin:8px 0;
-      border:1px solid #ccc;
-      border-radius:6px;
-      font-size:14px;
-    }
-    button{
-      background:#0d6efd;
-      color:#fff;
-      border:none;
-      padding:12px;
-      width:100%;
-      border-radius:6px;
-      font-size:16px;
-      cursor:pointer;
-    }
-    button:disabled{
-      background:#999;
-      cursor:not-allowed;
-    }
-    .plan{
-      border:1px solid #ddd;
-      padding:15px;
-      border-radius:8px;
-      margin-bottom:15px
-    }
-    .status{
-      text-align:center;
-      font-size:14px;
-      margin-top:10px;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>S2S Application Form</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f4f6f8;margin:0;padding:0;}
+.card{max-width:420px;margin:30px auto;background:#fff;padding:20px;border-radius:10px;box-shadow:0 4px 10px rgba(0,0,0,.1);}
+h2{text-align:center;margin-bottom:10px}
+input,select{width:100%;padding:10px;margin:8px 0;border:1px solid #ccc;border-radius:6px;font-size:14px;}
+button{background:#0d6efd;color:#fff;border:none;padding:12px;width:100%;border-radius:6px;font-size:16px;cursor:pointer;}
+button:disabled{background:#999;cursor:not-allowed;}
+.status{text-align:center;font-size:14px;margin-top:10px;}
+</style>
 </head>
-
 <body>
 
 <div class="card">
   <h2>S2S Application Form</h2>
-
   <form id="appForm" autocomplete="off">
     <input id="name" placeholder="Full Name" required />
     <input id="email" type="email" placeholder="Email Address" required />
@@ -80,82 +36,50 @@
   </form>
 </div>
 
-<div class="card">
-  <h2>INTERNET: SURF2SAWA BY CONVERGE</h2>
-
-  <div class="plan">
-    <h3>PLAN 700</h3>
-    <p><strong>Speed:</strong> Up to 50 Mbps</p>
-    <p><strong>Devices:</strong> Up to 6 Gadgets</p>
-    <p><strong>Price:</strong> ₱700 / month</p>
-  </div>
-
-  <div class="plan">
-    <h3>PLAN 999</h3>
-    <p><strong>Speed:</strong> Up to 100 Mbps</p>
-    <p><strong>Devices:</strong> Up to 6 Gadgets</p>
-    <p><strong>Bonus:</strong> FREE Cable TV</p>
-    <p><strong>Price:</strong> ₱999 / month</p>
-  </div>
-</div>
-
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-  import { getFirestore } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
-  import { getAuth } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyBA9j7bROzr1g4ywC2Pno8dyGE95IeRanE",
-    authDomain: "konektv-e272b.firebaseapp.com",
-    projectId: "konektv-e272b",
-    storageBucket: "konektv-e272b.firebasestorage.app",
-    messagingSenderId: "125358472826",
-    appId: "1:125358472826:web:7796301ea310ed121045c3"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyBA9j7bROzr1g4ywC2Pno8dyGE95IeRanE",
+  authDomain: "konektv-e272b.firebaseapp.com",
+  projectId: "konektv-e272b",
+  storageBucket: "konektv-e272b.firebasestorage.app",
+  messagingSenderId: "125358472826",
+  appId: "1:125358472826:web:7796301ea310ed121045c3"
+};
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const auth = getAuth(app);
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-  console.log("Firebase initialized", app);
+const form = document.getElementById("appForm");
+const btn = document.getElementById("submitBtn");
+const status = document.getElementById("status");
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  btn.disabled = true;
+  status.textContent = "Saving application...";
+
+  try {
+    await addDoc(collection(db, "applications"), {
+      name: form.name.value.trim(),
+      email: form.email.value.trim().toLowerCase(),
+      address: form.address.value.trim(),
+      plan: form.plan.value,
+      mobile: form.mobile.value.trim(),
+      created: serverTimestamp(),
+      source: "S2S Web Form"
+    });
+    status.textContent = "✅ Application saved successfully!";
+    form.reset();
+  } catch (err) {
+    console.error(err);
+    status.textContent = "❌ Failed to save. Please try again.";
+  } finally {
+    btn.disabled = false;
+  }
+});
 </script>
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  // Enable offline persistence
-  enableIndexedDbPersistence(db).catch(() => {});
-
-  const form = document.getElementById("appForm");
-  const btn = document.getElementById("submitBtn");
-  const status = document.getElementById("status");
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    btn.disabled = true;
-    status.textContent = "Saving application...";
-
-    try {
-      await addDoc(collection(db, "applications"), {
-        name: form.name.value.trim(),
-        email: form.email.value.trim().toLowerCase(),
-        address: form.address.value.trim(),
-        plan: form.plan.value,
-        mobile: form.mobile.value.trim(),
-        created: serverTimestamp(),
-        source: "S2S Web Form"
-      });
-
-      status.textContent = "✅ Application saved successfully!";
-      form.reset();
-    } catch (err) {
-      console.error(err);
-      status.textContent = "❌ Failed to save. Please try again.";
-    } finally {
-      btn.disabled = false;
-    }
-  });
-</script>
-
 </body>
 </html>
