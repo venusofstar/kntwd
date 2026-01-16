@@ -49,18 +49,25 @@
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-import { getFirestore, collection, query, orderBy, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+  import { getAuth } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBA9j7bROzr1g4ywC2Pno8dyGE95IeRanE",
-  authDomain: "konektv-e272b.firebaseapp.com",
-  projectId: "konektv-e272b",
-  storageBucket: "konektv-e272b.firebasestorage.app",
-  messagingSenderId: "125358472826",
-  appId: "1:125358472826:web:875f13bc542113ef1045c3"
-};
+  const firebaseConfig = {
+    apiKey: "AIzaSyBA9j7bROzr1g4ywC2Pno8dyGE95IeRanE",
+    authDomain: "konektv-e272b.firebaseapp.com",
+    projectId: "konektv-e272b",
+    storageBucket: "konektv-e272b.firebasestorage.app",
+    messagingSenderId: "125358472826",
+    appId: "1:125358472826:web:7796301ea310ed121045c3"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+
+  console.log("Firebase initialized", app);
+</script>
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
