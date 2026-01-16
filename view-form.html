@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>S2S Applications - View Data</title>
+
+  <style>
+    body{font-family:Arial;background:#f4f6f8;padding:20px}
+    table{width:100%;border-collapse:collapse;background:#fff}
+    th,td{padding:10px;border:1px solid #ccc;text-align:left}
+    th{background:#0d6efd;color:#fff}
+  </style>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+    import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBA9j7bROzr1g4ywC2Pno8dyGE95IeRanE",
+      authDomain: "konektv-e272b.firebaseapp.com",
+      projectId: "konektv-e272b",
+      storageBucket: "konektv-e272b.firebasestorage.app",
+      messagingSenderId: "125358472826",
+      appId: "1:125358472826:web:875f13bc542113ef1045c3"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const tableBody = document.getElementById('data');
+      const q = query(collection(db, "applications"), orderBy("created", "desc"));
+
+      onSnapshot(q, (snapshot) => {
+        tableBody.innerHTML = "";
+        snapshot.forEach(doc => {
+          const d = doc.data();
+          tableBody.innerHTML += `
+            <tr>
+              <td>${d.name || ''}</td>
+              <td>${d.email || ''}</td>
+              <td>${d.mobile || ''}</td>
+              <td>${d.plan || ''}</td>
+              <td>${d.address || ''}</td>
+            </tr>`;
+        });
+      });
+    });
+  </script>
+</head>
+
+<body>
+  <h2>S2S Applications – View Data</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Mobile</th>
+        <th>Plan</th>
+        <th>Address</th>
+      </tr>
+    </thead>
+    <tbody id="data"></tbody>
+  </table>
+</body>
+</html>
